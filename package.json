@@ -1,0 +1,21 @@
+{
+  "name": "graphql-revision",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec babel-node src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.15.8",
+    "@babel/node": "^7.15.8",
+    "@babel/preset-env": "^7.15.8"
+  },
+  "dependencies": {
+    "nodemon": "^2.0.14"
+  }
+}
