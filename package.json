@@ -16,6 +16,8 @@
     "@babel/preset-env": "^7.15.8"
   },
   "dependencies": {
+    "express": "^4.17.1",
+    "graphql-yoga": "^1.18.3",
     "nodemon": "^2.0.14"
   }
 }
