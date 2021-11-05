@@ -1,5 +1,6 @@
 import { GraphQLServer } from "graphql-yoga";
 import { demoUsers } from "../data/DemoUser";
+import { Post } from "../data/DemoPost";
 
 // graphqlServer => (type Definitions/schema) and resolvers
 //scalar types => string, boolean, int, float, id
@@ -13,8 +14,10 @@ import { demoUsers } from "../data/DemoUser";
 
 const typeDefs = `
   type Query{
-    users: [User!]!
     me: User!
+    users: [User!]!
+    posts: [Post]!
+    findPostByLetter(query: String): [Post]
     findByLetter(query: String): [User]
     post: Post!
   }
@@ -36,6 +39,14 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
+    findPostByLetter(_parents, args, context, info) {
+      if (!args.query) {
+        return Post;
+      }
+      return Post.filter((post) =>
+        post.title.toLowerCase().includes(args.query.toLowerCase())
+      );
+    },
     findByLetter(_parent, args, context, info) {
       if (!args.query) {
         return demoUsers;
