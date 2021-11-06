@@ -1,6 +1,7 @@
 import { GraphQLServer } from "graphql-yoga";
 import { demoUsers } from "../data/DemoUser";
 import { Post } from "../data/DemoPost";
+import { Comments } from "../data/DemoComments";
 
 // graphqlServer => (type Definitions/schema) and resolvers
 //scalar types => string, boolean, int, float, id
@@ -17,6 +18,12 @@ const typeDefs = `
     me: String!
     users(query:String): [User]!
     posts(query: String): [Post]!
+    comments(query: String): [Comment]!
+  }
+
+  type Comment{
+    id: ID!
+    textField: String!
   }
 
   type User{
@@ -55,6 +62,16 @@ const resolvers = {
 
       return Post.filter((post) =>
         post.title.toLowerCase().includes(args.query.toLowerCase())
+      );
+    },
+
+    comments(_parents, args, ctx, info) {
+      if (!args.query) {
+        return Comments;
+      }
+
+      return Comments.filter((cmnt) =>
+        cmnt.textField.toLowerCase().includes(args.query.toLowerCase())
       );
     },
   },
