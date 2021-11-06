@@ -14,12 +14,9 @@ import { Post } from "../data/DemoPost";
 
 const typeDefs = `
   type Query{
-    me: User!
-    users: [User!]!
-    posts: [Post]!
-    findPostByLetter(query: String): [Post]
-    findByLetter(query: String): [User]
-    post: Post!
+    me: String!
+    users(query:String): [User]!
+    posts(query: String): [Post]!
   }
 
   type User{
@@ -27,6 +24,7 @@ const typeDefs = `
     name: String!
     age: Int!
     email: String!
+    posts: [Post]!
   }
 
   type Post{
@@ -34,20 +32,14 @@ const typeDefs = `
     title: String!
     body: String!
     published: Boolean!
+    author: User!
   }
 `;
 
 const resolvers = {
   Query: {
-    findPostByLetter(_parents, args, context, info) {
-      if (!args.query) {
-        return Post;
-      }
-      return Post.filter((post) =>
-        post.title.toLowerCase().includes(args.query.toLowerCase())
-      );
-    },
-    findByLetter(_parent, args, context, info) {
+    me: () => "hello world",
+    users(_parent, args, ctx, info) {
       if (!args.query) {
         return demoUsers;
       }
@@ -55,24 +47,27 @@ const resolvers = {
         user.name.toLowerCase().includes(args.query.toLowerCase())
       );
     },
-    users(_parents, args, context, info) {
-      return demoUsers;
+
+    posts(_parent, args, ctx, info) {
+      if (!args.query) {
+        return Post;
+      }
+
+      return Post.filter((post) =>
+        post.title.toLowerCase().includes(args.query.toLowerCase())
+      );
     },
-    me() {
-      return {
-        id: "sdfasdfasdf",
-        name: "Vishal",
-        age: 23,
-        email: "drcyberx@gmail.com",
-      };
+  },
+
+  Post: {
+    author(_parents, args, ctx, info) {
+      return demoUsers.find((user) => user.id === _parents.author);
     },
-    post() {
-      return {
-        id: "safasdfasdf",
-        title: "Graphql 101",
-        body: "this is dummy body for this post",
-        published: true,
-      };
+  },
+
+  User: {
+    posts(_parents, args, ctx, info) {
+      return Post.filter((post) => post.author === _parents.id);
     },
   },
 };
