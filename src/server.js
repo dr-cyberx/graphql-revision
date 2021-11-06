@@ -24,6 +24,7 @@ const typeDefs = `
   type Comment{
     id: ID!
     textField: String!
+    author: User!
   }
 
   type User{
@@ -85,6 +86,11 @@ const resolvers = {
   User: {
     posts(_parents, args, ctx, info) {
       return Post.filter((post) => post.author === _parents.id);
+    },
+  },
+  Comment: {
+    author(_parents, args, ctx, info) {
+      return demoUsers.find((user) => user.id === _parents.author);
     },
   },
 };
