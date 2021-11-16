@@ -1,7 +1,5 @@
 import { GraphQLServer } from "graphql-yoga";
-import { demoUsers } from "../data/DemoUser";
-import { Post } from "../data/DemoPost";
-import { Comments } from "../data/DemoComments";
+import db from "../db/Index";
 
 // graphqlServer => (type Definitions/schema) and resolvers
 //scalar types => string, boolean, int, float, id
@@ -13,91 +11,65 @@ import { Comments } from "../data/DemoComments";
 // add: (parent, _args) => _args.num1 + _args.num2,
 // grades: (parent, _args, context, info) => [50, 60, 40, 20, 90, 10],
 
-const typeDefs = `
-  type Query{
-    me: String!
-    users(query:String): [User]!
-    posts(query: String): [Post]!
-    comments(query: String): [Comment]!
-  }
-
-  type Comment{
-    id: ID!
-    textField: String!
-    author: User!
-  }
-
-  type User{
-    id: ID!
-    name: String!
-    age: Int!
-    email: String!
-    posts: [Post]!
-  }
-
-  type Post{
-    id: ID!
-    title: String!
-    body: String!
-    published: Boolean!
-    author: User!
-  }
-`;
-
 const resolvers = {
   Query: {
     me: () => "hello world",
-    users(_parent, args, ctx, info) {
+    users(_parent, args, { db }, info) {
+
       if (!args.query) {
         return demoUsers;
       }
-      return demoUsers.filter((user) =>
+      return db.demoUsers.filter((user) =>
         user.name.toLowerCase().includes(args.query.toLowerCase())
       );
     },
 
-    posts(_parent, args, ctx, info) {
+    posts(_parent, args, { db }, info) {
       if (!args.query) {
-        return Post;
+        return db.Post;
       }
 
-      return Post.filter((post) =>
+      return db.Post.filter((post) =>
         post.title.toLowerCase().includes(args.query.toLowerCase())
       );
     },
 
-    comments(_parents, args, ctx, info) {
+    comments(_parents, args, { db }, info) {
       if (!args.query) {
-        return Comments;
+        return db.Comments;
       }
 
-      return Comments.filter((cmnt) =>
+      return db.Comments.filter((cmnt) =>
         cmnt.textField.toLowerCase().includes(args.query.toLowerCase())
       );
     },
   },
 
   Post: {
-    author(_parents, args, ctx, info) {
-      return demoUsers.find((user) => user.id === _parents.author);
+    author(_parents, args, { db }, info) {
+      console.log("parents =>>> ", _parents);
+      return db.demoUsers.find((user) => user.id === _parents.author);
     },
   },
 
   User: {
-    posts(_parents, args, ctx, info) {
-      return Post.filter((post) => post.author === _parents.id);
+    posts(_parents, args, { db }, info) {
+      return db.Post.filter((post) => post.author === _parents.id);
     },
   },
   Comment: {
-    author(_parents, args, ctx, info) {
-      return demoUsers.find((user) => user.id === _parents.author);
+    author(_parents, args, { db }, info) {
+      return db.demoUsers.find((user) => user.id === _parents.author);
     },
   },
 };
 
 const server = new GraphQLServer({
-  typeDefs, // use of shorthand
+  typeDefs: "./src/schema.graphql", // use of shorthand
   resolvers,
+  context: {
+    db,
+  },
 });
 
 server.start(() => {

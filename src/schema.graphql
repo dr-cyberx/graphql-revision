@@ -1,0 +1,28 @@
+  type Query{
+    me: String!
+    users(query:String): [User]!
+    posts(query: String): [Post]!
+    comments(query: String): [Comment]!
+  }
+
+  type Comment{
+    id: ID!
+    textField: String!
+    author: User!
+  }
+
+  type User{
+    id: ID!
+    name: String!
+    age: Int!
+    email: String!
+    posts: [Post]!
+  }
+
+  type Post{
+    id: ID!
+    title: String!
+    body: String!
+    published: Boolean!
+    author: User!
+  }
